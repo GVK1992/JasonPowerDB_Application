@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html lang="en">
+    <head>
+        <title>Bootstrap Example</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet"
+              href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        <script
+        src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script
+        src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <h2>Data of Selected Interns.</h2>
+            <form id="empForm" method="post">
+                <div class="form-group">
+                    <span><label for="internId">Intern ID:</label> <label id="intermIdMsg">
+                        </label></span>
+                    <input type="text" class="form-control" name="internId" id="internId"
+                           placeholder="Enter Intern ID" required>
+                </div>
+                <div class="form-group">
+                    <label for="internName">Intern Name:</label>
+                    <input type="text" class="form-control" id="internName"
+                           placeholder="Enter Employee Name" name="empName">
+                </div>
+                <div class="form-group">
+                    <label for="internEmail">Email:</label>
+                    <input type="email" class="form-control" id="internEmail"
+                           placeholder="Enter Intern Email" name="internEmail">
+                </div>
+                <div class="form-group">
+                    <label for="internRole">Role:</label>
+                    <input type="text" class="form-control" id="internEmail"
+                           placeholder="Enter Intern Role" name="internRole">
+                </div>
+                <input type="button" class="btn btn-primary" id="internSave" value="Save"
+                       onclick="SaveInterns();">
+            </form>
+        </div>
+        <script>
+            function validateAndGetFormData() {
+                var internIdVar = $("#internId").val();
+                if (internIdVar === "") {
+                    alert("Intern ID Required Value");
+                    $("#internId").focus();
+                    return "";
+                }
+                var internNameVar = $("#internName").val();
+                if (internNameVar === "") {
+                    alert("intern Name is Required Value");
+                    $("#internName").focus();
+                    return "";
+                }
+                var internEmailVar = $("#internEmail").val();
+                if (internEmailVar === "") {
+                    alert("intern Email is Required Value");
+                    $("#internEmail").focus();
+                    return "";
+                }
+                var internRoleVar = $("#internRole").val();
+                if (internRoleVar === "") {
+                    alert("intern Role is Required Value");
+                    $("#internRole").focus();
+                    return "";
+                }
+                var jsonStrObj = {
+                    internId: internIdVar,
+                    internName: internNameVar,
+                    internEmail: internEmailVar,
+                    internRole: internRoleVar,
+                };
+                return JSON.stringify(jsonStrObj);
+            }
+            function createPUTRequest(connToken, jsonObj, dbName, relName) {
+                var putRequest = "{\n"
+                        + "\"token\" : \""
+                        + connToken
+                        + "\","
+                        + "\"dbName\": \""
+                        + dbName
+                        + "\",\n" + "\"cmd\" : \"PUT\",\n"
+                        + "\"rel\" : \""
+                        + relName + "\","
+                        + "\"jsonStr\": \n"
+                        + jsonObj
+                        + "\n"
+                        + "}";
+                return putRequest;
+            }
+            function executeCommand(reqString, dbBaseUrl, apiEndPointUrl) {
+                var url = dbBaseUrl + apiEndPointUrl;
+                var jsonObj;
+                $.post(url, reqString, function (result) {
+                    jsonObj = JSON.parse(result);
+                }).fail(function (result) {
+                    var dataJsonObj = result.responseText;
+                    jsonObj = JSON.parse(dataJsonObj);
+                });
+                return jsonObj;
+            }
+            function resetForm() {
+                $("#internId").val("")
+                $("#internName").val("");
+                $("#internEmail").val("");
+                $("#internRole").val("");
+                $("#internId").focus();
+            }
+
+            function SaveInterns() {
+                var jsonStr = validateAndGetFormData();
+                if (jsonStr === "") {
+                    return;
+                }
+                var putReqStr = createPUTRequest("90938592|-31948825599698111|90946771",
+                        jsonStr, "Intern", "Intern-rel");
+                alert(putReqStr);
+                jQuery.ajaxSetup({async: false});
+                var resultObj = executeCommand(putReqStr,
+                        "http://api.login2explore.com:5577", "/api/iml");
+                alert(JSON.stringify(resultObj));
+                jQuery.ajaxSetup({async: true});
+                resetForm();
+            }
+
+        </script>
+    </body>
+
+</html>
